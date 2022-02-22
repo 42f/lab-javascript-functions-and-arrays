@@ -207,6 +207,13 @@ const matrix_revolutions = [
   [0, 0, 1, 10000],
 ]
 
+const matrix_resurections = [
+  [1, 0, 0, 0],
+  [0, 1, 0, 0],
+  [0, 0, 1, 0],
+  [100, 0, 0, 1],
+];
+
 function getVerticalProduct(matrix, posX, posY) {
   const matrixHeight = matrix.length;
 
@@ -215,14 +222,21 @@ function getVerticalProduct(matrix, posX, posY) {
     case 1:
       return matrix[posY][posX];
     case 2:
-      return matrix[posY][posX] * matrix[posY + 1][posX];
+      return matrix[posY][posX]
+        * matrix[posY + 1][posX];
     case 3:
-      return matrix[posY][posX] * matrix[posY + 1][posX] * matrix[posY + 2][posX];
+      return matrix[posY][posX]
+        * matrix[posY + 1][posX]
+        * matrix[posY + 2][posX];
 
     default:
-      return matrix[posY][posX] * matrix[posY + 1][posX] * matrix[posY + 2][posX] * matrix[posY + 3][posX];
+      return matrix[posY][posX]
+        * matrix[posY + 1][posX]
+        * matrix[posY + 2][posX]
+        * matrix[posY + 3][posX];
   }
 }
+
 function getHorizontalProduct(matrix, posX, posY) {
   const matrixWidth = matrix[0].length;
 
@@ -231,17 +245,23 @@ function getHorizontalProduct(matrix, posX, posY) {
     case 1:
       return matrix[posY][posX];
     case 2:
-      return matrix[posY][posX] * matrix[posY][posX + 1];
+      return matrix[posY][posX]
+        * matrix[posY][posX + 1];
     case 3:
-      return matrix[posY][posX] * matrix[posY][posX + 1] * matrix[posY][posX + 2];
+      return matrix[posY][posX]
+        * matrix[posY][posX + 1]
+        * matrix[posY][posX + 2];
 
     default:
-      return matrix[posY][posX] * matrix[posY][posX + 1] * matrix[posY][posX + 2] * matrix[posY][posX + 3];
+      return matrix[posY][posX]
+        * matrix[posY][posX + 1]
+        * matrix[posY][posX + 2]
+        * matrix[posY][posX + 3];
 
   }
 }
 
-function getMaxProductAtPos(matrix, posX, posY) {
+function getStraightMaxProductAtPos(matrix, posX, posY) {
 
   const verticalProduct = getVerticalProduct(matrix, posX, posY);
   const horizontalProduct = getHorizontalProduct(matrix, posX, posY);
@@ -260,7 +280,7 @@ function greatestProduct(matrix) {
 
   matrix.forEach((line) => {
     if (line.length != matrixWidth) {
-      throw new Error('Matrix has not uniform lines');
+      throw new Error('The matrix lines are not uniform');
     }
   })
 
@@ -268,7 +288,7 @@ function greatestProduct(matrix) {
 
   for (let posY = 0; posY < matrixHeight; posY++) {
     for (let posX = 0; posX < matrixWidth; posX++) {
-      const maxProdutAtPos = getMaxProductAtPos(matrix, posX, posY);
+      const maxProdutAtPos = getStraightMaxProductAtPos(matrix, posX, posY);
       maxProductInMatrix = maxOfTwoNumbers(maxProductInMatrix, maxProdutAtPos);
     }
   }
@@ -281,11 +301,104 @@ console.log(greatestProduct(matrix_reloaded));
 console.log(greatestProduct(matrix_revolutions));
 */
 
+
+
+
+
 // Iteration #8.1: Bonus
+
+function getLeftDiagonalProduct(matrix, posX, posY) {
+
+  const rangeSize = posX < posY ? posX : posY;
+
+  switch (rangeSize) {
+    case 0:
+    case 1:
+      return matrix[posY][posX];
+    case 2:
+      return matrix[posY][posX]
+        * matrix[posY - 1][posX - 1];
+    case 3:
+      return matrix[posY][posX]
+        * matrix[posY - 1][posX - 1]
+        * matrix[posY - 2][posX - 2];
+
+    default:
+      return matrix[posY][posX]
+        * matrix[posY - 1][posX - 1]
+        * matrix[posY - 2][posX - 2]
+        * matrix[posY - 3][posX - 3];
+  }
+}
+
+function getRightDiagonalProduct(matrix, posX, posY) {
+  const matrixHeight = matrix.length;
+  const matrixWidth = matrix[0].length;
+
+  const xRange = matrixWidth - posX;
+  const yRange = matrixHeight - posY;
+
+  const rangeSize = xRange < yRange ? xRange : yRange;
+
+  switch (rangeSize) {
+    case 1:
+      return matrix[posY][posX];
+    case 2:
+      return matrix[posY][posX]
+        * matrix[posY + 1][posX + 1];
+    case 3:
+      return matrix[posY][posX]
+        * matrix[posY + 1][posX + 1]
+        * matrix[posY + 2][posX + 2];
+
+    default:
+      return matrix[posY][posX]
+        * matrix[posY + 1][posX + 1]
+        * matrix[posY + 2][posX + 2]
+        * matrix[posY + 3][posX + 3];
+  }
+}
+
+function getDiagonalMaxProductAtPos(matrix, posX, posY) {
+
+  const leftDiagonalProduct = getLeftDiagonalProduct(matrix, posX, posY);
+  const rightDiagonalProduct = getRightDiagonalProduct(matrix, posX, posY);
+
+  return maxOfTwoNumbers(rightDiagonalProduct, leftDiagonalProduct);
+}
 
 function greatestProductOfDiagonals(matrix) {
 
+  if (!matrix || matrix.length === 0) {
+    return 0;
+  }
+
+  const matrixWidth = matrix[0].length;
+  const matrixHeight = matrix.length;
+
+  matrix.forEach((line) => {
+    if (line.length != matrixWidth) {
+      throw new Error('The matrix lines are not uniform');
+    }
+  })
+
+  let maxProductInMatrix = 0;
+
+  for (let posY = 0; posY < matrixHeight; posY++) {
+    for (let posX = 0; posX < matrixWidth; posX++) {
+      const maxProdutAtPos = getDiagonalMaxProductAtPos(matrix, posX, posY);
+      maxProductInMatrix = maxOfTwoNumbers(maxProductInMatrix, maxProdutAtPos);
+    }
+  }
+  return maxProductInMatrix;
 }
+
+/*
+console.log(greatestProductOfDiagonals(matrix));
+console.log(greatestProductOfDiagonals(matrix_reloaded));
+console.log(greatestProductOfDiagonals(matrix_revolutions));
+console.log(greatestProductOfDiagonals(matrix_resurections));
+*/
 
 // The following is required to make unit tests work.
 /* Environment setup. Do not modify the below code. */
